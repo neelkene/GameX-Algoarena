@@ -354,6 +354,44 @@ const sounds = {
       filteredNoise(0.4, 0.03, 80);
     }, Math.random() * 200);
   },
+
+  /** Kill cam dramatic sound */
+  killCam() {
+    const { ctx: c, master } = getCtx();
+    if (muted) return;
+    // Deep resonant boom
+    playTone(25, 1.2, "sine", 0.3);
+    playTone(40, 0.8, "triangle", 0.15);
+    filteredNoise(0.8, 0.12, 100);
+    // Rising tension
+    const osc = c.createOscillator();
+    const gain = c.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(80, c.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(400, c.currentTime + 0.8);
+    gain.gain.setValueAtTime(0.05, c.currentTime);
+    gain.gain.linearRampToValueAtTime(0.1, c.currentTime + 0.5);
+    gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 1.2);
+    osc.connect(gain).connect(master);
+    osc.start();
+    osc.stop(c.currentTime + 1.3);
+    // Metallic ring
+    setTimeout(() => {
+      playTone(1200, 0.6, "sine", 0.04);
+      playTone(1800, 0.5, "sine", 0.03);
+    }, 200);
+  },
+
+  /** Armor breaking apart */
+  armorShatter() {
+    noise(0.3, 0.1);
+    playTone(80, 0.3, "sawtooth", 0.12);
+    setTimeout(() => noise(0.15, 0.06), 100);
+    setTimeout(() => {
+      playTone(2500, 0.08, "square", 0.05);
+      playTone(3500, 0.06, "square", 0.03);
+    }, 50);
+  },
 };
 
 /* ---------- Ambient Background ---------- */
