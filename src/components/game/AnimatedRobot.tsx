@@ -84,17 +84,35 @@ const AnimatedRobot = ({
   const recoilX = recoilDirection === "left" ? -15 : recoilDirection === "right" ? 15 : 0;
 
   return (
-    <div ref={robotRef} className={`relative ${className}`} style={{ width: size, height: size }}>
-      {/* Ambient glow */}
+    <div ref={robotRef} className={`relative ${className}`} style={{ width: size, height: size, perspective: "1200px" }}>
+      {/* Main robot container with 3D perspective */}
       <motion.div
-        className="absolute inset-0 rounded-full pointer-events-none"
-        style={{ background: `radial-gradient(circle, ${hasDamage ? damageColor : baseColor}, transparent 65%)` }}
+        className="w-full h-full relative"
         animate={{
-          opacity: [config.glowIntensity * 0.3, config.glowIntensity * 0.6, config.glowIntensity * 0.3],
-          scale: [1, 1.15, 1],
+          y: [0, config.bobAmount, 0],
+          x: recoilX,
+          rotateX: recoilDirection ? 5 : 0,
+          rotateY: recoilDirection ? (recoilDirection === "left" ? -8 : 8) : 0,
+          rotateZ: recoilDirection ? (recoilDirection === "left" ? -3 : 3) : 0,
         }}
-        transition={{ repeat: Infinity, duration: config.coreSpeed, ease: "easeInOut" }}
-      />
+        transition={{
+          y: { repeat: Infinity, duration: config.bobSpeed, ease: "easeInOut" },
+          x: { duration: 0.15, type: "spring", stiffness: 200 },
+          rotateX: { duration: 0.15 },
+          rotateY: { duration: 0.15 },
+          rotateZ: { duration: 0.15 },
+        }}
+        style={{ transformStyle: "preserve-3d" }}>
+        {/* Ambient glow */}
+        <motion.div
+          className="absolute inset-0 rounded-full pointer-events-none"
+          style={{ background: `radial-gradient(circle, ${hasDamage ? damageColor : baseColor}, transparent 65%)` }}
+          animate={{
+            opacity: [config.glowIntensity * 0.3, config.glowIntensity * 0.6, config.glowIntensity * 0.3],
+            scale: [1, 1.15, 1],
+          }}
+          transition={{ repeat: Infinity, duration: config.coreSpeed, ease: "easeInOut" }}
+        />
 
       {/* Energy shield */}
       <AnimatePresence>
@@ -440,6 +458,7 @@ const AnimatedRobot = ({
           </>
         )}
       </AnimatePresence>
+      </motion.div>
     </div>
   );
 };

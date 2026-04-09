@@ -408,3 +408,248 @@ export const BattlefieldDamage = ({ intensity }: { intensity: number }) => {
     </div>
   );
 };
+
+/* ---------- ADVANCED 3D EFFECTS ---------- */
+
+/* Chromatic Aberration - RGB channel separation */
+export const ChromaticAberration = ({ active, intensity = 1 }: { active: boolean; intensity?: number }) => {
+  return (
+    <AnimatePresence>
+      {active && (
+        <motion.div className="absolute inset-0 z-[60] pointer-events-none overflow-hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: intensity }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}>
+          {/* Red channel offset */}
+          <motion.div className="absolute inset-0"
+            style={{
+              background: "linear-gradient(90deg, hsl(0 80% 50% / 0.15), transparent 30%, transparent 70%, hsl(0 80% 50% / 0.1))",
+              boxShadow: "inset 0 0 60px hsl(0 80% 50% / 0.1)",
+            }}
+            animate={{ x: [6, 0, -8], opacity: [0.3, 0, 0.2] }}
+            transition={{ duration: 0.4 }} />
+          {/* Green channel offset */}
+          <motion.div className="absolute inset-0"
+            style={{
+              background: "linear-gradient(-90deg, hsl(120 80% 50% / 0.12), transparent 40%, transparent 60%)",
+              boxShadow: "inset -3px 0 40px hsl(120 80% 50% / 0.08)",
+            }}
+            animate={{ x: [-4, 0, 6], opacity: [0.2, 0, 0.15] }}
+            transition={{ duration: 0.4, delay: 0.05 }} />
+          {/* Blue channel offset */}
+          <motion.div className="absolute inset-0"
+            style={{
+              background: "linear-gradient(0deg, hsl(240 100% 50% / 0.1), transparent 20%, transparent 80%, hsl(240 100% 50% / 0.08))",
+              boxShadow: "inset 0 4px 40px hsl(240 100% 50% / 0.1)",
+            }}
+            animate={{ y: [4, 0, -6], opacity: [0.15, 0, 0.12] }}
+            transition={{ duration: 0.4, delay: 0.1 }} />
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+/* Lens Distortion - Barrel/fish-eye effect */
+export const LensDistortion = ({ active }: { active: boolean }) => {
+  return (
+    <AnimatePresence>
+      {active && (
+        <motion.div className="absolute inset-0 z-[55] pointer-events-none"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}>
+          {/* SVG for actual lens distortion */}
+          <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1 1" preserveAspectRatio="none">
+            <defs>
+              <filter id="lensdistort">
+                <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" result="noise" seed={Math.random()} />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="0.02" xChannelSelector="R" yChannelSelector="G" />
+              </filter>
+            </defs>
+            <motion.rect width="1" height="1" fill="hsl(220 20% 5% / 0.3)"
+              filter="url(#lensdistort)"
+              animate={{ opacity: [0.4, 0.2, 0] }}
+              transition={{ duration: 0.5 }} />
+          </svg>
+          {/* Radial vignette with distortion */}
+          <motion.div className="absolute inset-0"
+            style={{
+              background: `radial-gradient(ellipse at 50% 50%, transparent 30%, hsl(0 0% 0% / 0.25) 70%, hsl(0 0% 0% / 0.5) 100%)`,
+              backdropFilter: "blur(0.25px)",
+            }}
+            animate={{ opacity: [0.2, 0.5, 0.1] }}
+            transition={{ duration: 0.6 }} />
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+/* 3D Perspective Impact Ripple */
+export const ImpactRipple = ({ active, side, color }: { active: boolean; side: "left" | "right"; color: "cyan" | "orange" }) => {
+  const baseColor = color === "cyan" ? "hsl(195 100% 50%)" : "hsl(25 95% 55%)";
+  
+  return (
+    <AnimatePresence>
+      {active && (
+        <div className={`absolute z-28 ${side === "left" ? "left-[18%]" : "right-[18%]"} top-1/2 -translate-y-1/2 -translate-x-1/2`}>
+          {/* Concentric ripples with 3D perspective */}
+          {[0, 1, 2, 3, 4].map(i => (
+            <motion.div key={`ripple-${i}`} className="absolute rounded-full"
+              style={{
+                width: 30,
+                height: 30,
+                border: `2px solid ${baseColor}`,
+                boxShadow: `0 0 ${15 + i * 8}px ${baseColor}, inset 0 0 ${10 + i * 4}px ${baseColor}`,
+              }}
+              initial={{ scale: 0.2, opacity: 0.8, rotateX: 0 }}
+              animate={{
+                scale: [0.2, 3.5, 5.5],
+                opacity: [0.8, 0.4, 0],
+                rotateX: [0, 45, 90],
+              }}
+              transition={{ duration: 0.9, delay: i * 0.08, ease: "easeOut" }} />
+          ))}
+          {/* Central impact point glow */}
+          <motion.div className="absolute rounded-full"
+            style={{
+              width: 20,
+              height: 20,
+              background: baseColor,
+              boxShadow: `0 0 30px ${baseColor}, 0 0 60px ${baseColor}`,
+              filter: "blur(3px)",
+            }}
+            animate={{ scale: [1, 2, 0.5], opacity: [0.8, 0.3, 0] }}
+            transition={{ duration: 0.7 }} />
+        </div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+/* Motion Blur on Energy Beams */
+export const MotionBlurBeam = ({ active, direction }: { active: boolean; direction: "left-to-right" | "right-to-left" }) => {
+  return (
+    <AnimatePresence>
+      {active && (
+        <motion.div
+          className={`absolute top-1/2 -translate-y-1/2 z-36 pointer-events-none`}
+          style={{
+            [direction === "left-to-right" ? "left" : "right"]: "25%",
+            width: "50%",
+            height: "8px",
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}>
+          {/* Multiple blur trails */}
+          {[0, 1, 2, 3].map(i => {
+            const isLeft = direction === "left-to-right";
+            const color = isLeft ? "hsl(195 100% 50%)" : "hsl(25 95% 55%)";
+            return (
+              <motion.div key={`blur-${i}`} className="absolute h-full"
+                style={{
+                  width: "40%",
+                  background: `linear-gradient(${isLeft ? "90deg" : "-90deg"}, ${color}, transparent)`,
+                  opacity: 0.6 - i * 0.15,
+                  filter: "blur(4px)",
+                }}
+                animate={{
+                  x: isLeft ? ["-100%", "150%"] : ["100%", "-150%"],
+                }}
+                transition={{ duration: 0.35, delay: i * 0.05 }} />
+            );
+          })}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+/* Dynamic Light Flare - reactive to impacts */
+export const LightFlare = ({ active, side }: { active: boolean; side: "left" | "right" }) => {
+  const color = side === "left" ? "hsl(195 100% 50%)" : "hsl(25 95% 55%)";
+  
+  return (
+    <AnimatePresence>
+      {active && (
+        <motion.div
+          className={`absolute z-[65] pointer-events-none ${side === "left" ? "left-0" : "right-0"} top-1/2 -translate-y-1/2`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}>
+          {/* Main lens flare */}
+          <motion.div className="absolute inset-0"
+            style={{
+              width: "100%",
+              height: "200%",
+              background: `radial-gradient(ellipse at ${side === "left" ? "30%" : "70%"} 50%, ${color} 0%, transparent 60%)`,
+              filter: "blur(40px)",
+            }}
+            animate={{ opacity: [0.4, 1, 0.2] }}
+            transition={{ duration: 0.5 }} />
+          {/* Lens flare circles */}
+          {[1, 2, 3].map(i => (
+            <motion.div key={`flare-${i}`} className="absolute rounded-full"
+              style={{
+                width: 40 * i,
+                height: 40 * i,
+                border: `1px solid ${color}`,
+                opacity: 0.3 - i * 0.05,
+                [side === "left" ? "left" : "right"]: "-100%",
+                top: "50%",
+                transform: "translateY(-50%)",
+              }}
+              animate={{ scale: [0.5, 1.5], opacity: [0.3 - i * 0.05, 0] }}
+              transition={{ duration: 0.6, delay: i * 0.1 }} />
+          ))}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+/* Shatter Glass Effect - on critical hits */
+export const GlassShatter = ({ active, side }: { active: boolean; side: "left" | "right" }) => {
+  const shards = useMemo(() => Array.from({ length: 20 }).map((_, i) => ({
+    id: i,
+    x: (Math.random() - 0.5) * 200,
+    y: (Math.random() - 0.5) * 200,
+    size: Math.random() * 12 + 4,
+    rotation: Math.random() * 360,
+    spin: Math.random() * 720 - 360,
+    delay: Math.random() * 0.15,
+  })), []);
+
+  return (
+    <AnimatePresence>
+      {active && (
+        <div className={`absolute z-50 ${side === "left" ? "left-[15%]" : "right-[15%]"} top-1/2 -translate-y-1/2`}>
+          {shards.map(s => (
+            <motion.div key={s.id} className="absolute"
+              style={{
+                width: s.size,
+                height: s.size,
+                background: side === "left" ? "hsl(25 95% 55% / 0.8)" : "hsl(195 100% 50% / 0.8)",
+                border: `1px solid ${side === "left" ? "hsl(25 95% 65%)" : "hsl(195 100% 60%)"}`,
+                boxShadow: `0 0 ${s.size + 2}px ${side === "left" ? "hsl(25 95% 55%)" : "hsl(195 100% 50%)"}`,
+              }}
+              initial={{ x: 0, y: 0, opacity: 1, scale: 1, rotate: 0 }}
+              animate={{
+                x: s.x,
+                y: s.y,
+                opacity: [1, 0.6, 0],
+                scale: [1, 0.8, 0],
+                rotate: s.spin,
+              }}
+              transition={{ duration: 1.2, delay: s.delay, ease: "easeOut" }} />
+          ))}
+        </div>
+      )}
+    </AnimatePresence>
+  );
+};

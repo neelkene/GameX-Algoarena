@@ -9,6 +9,8 @@ import {
   DebrisField, ShockwaveRing, GroundCrack, SmokeCloud,
   EnergyShield, WeaponCharge, ExplosionFlash, HeatDistortion, DustImpact,
   PlasmaTrail, KillCamOverlay, BattlefieldDamage,
+  ChromaticAberration, LensDistortion, ImpactRipple, MotionBlurBeam,
+  LightFlare, GlassShatter,
 } from "./BattleEffects";
 import { getAIChallenge, stolenCodeRewards, type Challenge } from "@/data/challenges";
 import { useSoundEngine } from "@/hooks/useSoundEngine";
@@ -164,6 +166,14 @@ const BattleArena = ({ language, difficulty, level, onVictory, onDefeat }: Battl
   const [aiRecoil, setAiRecoil] = useState<"left" | "right" | null>(null);
   const [showPlasmaTrail, setShowPlasmaTrail] = useState<"left-to-right" | "right-to-left" | null>(null);
 
+  // Advanced 3D effects
+  const [showChromaticAberration, setShowChromaticAberration] = useState(false);
+  const [showLensDistortion, setShowLensDistortion] = useState(false);
+  const [showImpactRipple, setShowImpactRipple] = useState<{ side: "left" | "right"; color: "cyan" | "orange" } | null>(null);
+  const [showMotionBlur, setShowMotionBlur] = useState<"left-to-right" | "right-to-left" | null>(null);
+  const [showLightFlare, setShowLightFlare] = useState<"left" | "right" | null>(null);
+  const [showGlassShatter, setShowGlassShatter] = useState<"left" | "right" | null>(null);
+
   // Cinematic camera
   const [cameraZoom, setCameraZoom] = useState(1);
   const [cameraX, setCameraX] = useState(0);
@@ -216,6 +226,15 @@ const BattleArena = ({ language, difficulty, level, onVictory, onDefeat }: Battl
     setScreenShake(true);
     if (side === "left") { setPlayerRecoil("left"); } else { setAiRecoil("right"); }
 
+    // NEW 3D EFFECTS
+    setShowChromaticAberration(true);
+    setShowLensDistortion(true);
+    setShowImpactRipple({ side, color });
+    setShowLightFlare(side === "left" ? "left" : "right");
+    if (isKill) {
+      setShowGlassShatter(side);
+    }
+
     sounds.heavyImpact(side);
 
     // Accumulate battlefield degradation
@@ -237,10 +256,20 @@ const BattleArena = ({ language, difficulty, level, onVictory, onDefeat }: Battl
     }
 
     setTimeout(() => {
-      setShowSparks(null); setShowDebris(null); setShowShockwave(null);
-      setShowFlash(false); setShowHeat(false); setShowDust(null);
+      setShowSparks(null); 
+      setShowDebris(null); 
+      setShowShockwave(null);
+      setShowFlash(false); 
+      setShowHeat(false); 
+      setShowDust(null);
       setScreenShake(false);
-      setPlayerRecoil(null); setAiRecoil(null);
+      setPlayerRecoil(null); 
+      setAiRecoil(null);
+      setShowChromaticAberration(false);
+      setShowLensDistortion(false);
+      setShowImpactRipple(null);
+      setShowLightFlare(null);
+      setShowGlassShatter(null);
     }, 800);
     setTimeout(() => { setShowSmoke(null); setShowGroundCrack(null); }, 2000);
   };
@@ -263,6 +292,7 @@ const BattleArena = ({ language, difficulty, level, onVictory, onDefeat }: Battl
         setShowWeaponCharge(null);
         setShowBeam("right-to-left");
         setShowPlasmaTrail("right-to-left");
+        setShowMotionBlur("right-to-left");
         sounds.beam("right");
         setCameraZoom(1);
         setCameraX(0);
@@ -270,6 +300,7 @@ const BattleArena = ({ language, difficulty, level, onVictory, onDefeat }: Battl
         setTimeout(() => {
           setShowBeam(null);
           setShowPlasmaTrail(null);
+          setShowMotionBlur(null);
           setPlayerRobotMood("worried");
 
           // Check kill before impact
@@ -340,6 +371,7 @@ const BattleArena = ({ language, difficulty, level, onVictory, onDefeat }: Battl
         setShowWeaponCharge(null);
         setShowBeam("left-to-right");
         setShowPlasmaTrail("left-to-right");
+        setShowMotionBlur("left-to-right");
         sounds.beam("left");
         setCameraZoom(1);
         setCameraX(0);
@@ -347,6 +379,7 @@ const BattleArena = ({ language, difficulty, level, onVictory, onDefeat }: Battl
         setTimeout(() => {
           setShowBeam(null);
           setShowPlasmaTrail(null);
+          setShowMotionBlur(null);
           setAiRobotMood("worried");
 
           const isKillShot = aiHP - challenge.damage <= 0;
@@ -500,9 +533,11 @@ const BattleArena = ({ language, difficulty, level, onVictory, onDefeat }: Battl
 
             {/* All Battle Effects */}
             <AnimatePresence>{showBeam && <EnergyBeam key="beam" direction={showBeam} />}</AnimatePresence>
+            <MotionBlurBeam active={!!showMotionBlur} direction={showMotionBlur || "left-to-right"} />
             <AnimatePresence>{showSparks && <SparkParticles key="sparks" side={showSparks.side} color={showSparks.color} />}</AnimatePresence>
             {showDebris && <DebrisField active side={showDebris.side} intensity={1.3} />}
             {showShockwave && <ShockwaveRing active side={showShockwave.side} color={showShockwave.color} />}
+            {showImpactRipple && <ImpactRipple active side={showImpactRipple.side} color={showImpactRipple.color} />}
             {showGroundCrack && <GroundCrack active side={showGroundCrack.side} />}
             {showSmoke && <SmokeCloud active side={showSmoke.side} />}
             {showDust && <DustImpact active side={showDust.side} />}
@@ -510,7 +545,13 @@ const BattleArena = ({ language, difficulty, level, onVictory, onDefeat }: Battl
             <PlasmaTrail active={!!showPlasmaTrail} direction={showPlasmaTrail || "left-to-right"} />
             <ExplosionFlash active={showFlash} />
             <HeatDistortion active={showHeat} />
+            <LightFlare active={!!showLightFlare} side={showLightFlare || "left"} />
+            {showGlassShatter && <GlassShatter active side={showGlassShatter} />}
           </motion.div>
+
+          {/* 3D Post-Process Effects */}
+          <ChromaticAberration active={showChromaticAberration} intensity={0.7} />
+          <LensDistortion active={showLensDistortion} />
 
           {/* Robot Companion */}
           <motion.div className="mt-3" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
