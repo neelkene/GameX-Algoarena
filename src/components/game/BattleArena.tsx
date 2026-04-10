@@ -216,8 +216,15 @@ const BattleArena = ({ language, difficulty, level, onVictory, onDefeat }: Battl
 
   const handleIntroComplete = useCallback(() => {
     sounds.fightStart();
-    setPhase("ai-attack");
-  }, [sounds]);
+    setRobotMood("thinking");
+    setRobotMsg("You strike first, Commander! Show them your code! 🎯");
+    getAIChallenge(language, difficulty).then(c => {
+      setChallenge(c);
+      setAnswer("");
+      setShowHint(false);
+      setPhase("player-turn");
+    });
+  }, [sounds, language, difficulty]);
 
   // Helper to trigger full impact effects + accumulate battlefield damage
   const triggerImpact = (side: "left" | "right", color: "cyan" | "orange", isKill = false) => {
