@@ -145,8 +145,8 @@ const BattleArena = ({ language, difficulty, level, onVictory, onDefeat }: Battl
   const [robotMsg, setRobotMsg] = useState("Systems online. Scanning opponent... 🤖");
   const [playerRobotMood, setPlayerRobotMood] = useState<RobotMood>("idle");
   const [aiRobotMood, setAiRobotMood] = useState<RobotMood>("idle");
-  const [playerAction, setPlayerAction] = useState("idle");
-  const [aiAction, setAiAction] = useState("idle");
+  const [playerAction, setPlayerAction] = useState<"idle" | "move" | "attack" | "hit">("idle");
+  const [aiAction, setAiAction] = useState<"idle" | "move" | "attack" | "hit">("idle");
 
   // Animation states
   const [showBeam, setShowBeam] = useState<"left-to-right" | "right-to-left" | null>(null);
