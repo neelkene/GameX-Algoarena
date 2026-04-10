@@ -242,8 +242,13 @@ const BattleArena = ({ language, difficulty, level, onVictory, onDefeat }: Battl
     }
 
     sounds.heavyImpact(side);
+    combatMusic.triggerHitAccent();
 
-    // Accumulate battlefield degradation
+    // Drop on kill for maximum impact
+    if (isKill) {
+      combatMusic.triggerSilence(0.3);
+      setTimeout(() => combatMusic.triggerDrop(), 350);
+    }
     totalHitsRef.current += 1;
     setBattlefieldDamage(Math.min(1, totalHitsRef.current * 0.08));
 
