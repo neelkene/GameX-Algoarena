@@ -481,7 +481,7 @@ function startBattleMusic() {
   // Tension drone
   const drone = c.createOscillator();
   drone.type = "sine";
-  drone.frequency.value = 220;
+  drone.frequency.value = 250;
   const droneGain = c.createGain();
   droneGain.gain.value = 0.06;
   const droneLfo = c.createOscillator();
@@ -498,7 +498,7 @@ function startBattleMusic() {
   // Sub rumble
   const sub = c.createOscillator();
   sub.type = "sine";
-  sub.frequency.value = 30;
+  sub.frequency.value = 60;
   const subGain = c.createGain();
   subGain.gain.value = 0.15;
   sub.connect(subGain).connect(gain);
