@@ -133,6 +133,7 @@ const BattleArena = ({ language, difficulty, level, onVictory, onDefeat }: Battl
   const maxPlayerHP = 100;
   const maxAiHP = difficultyHP[difficulty];
   const { sounds, startBattleMusic, stopBattleMusic, setMusicIntensity } = useSoundEngine();
+  const combatMusic = useCombatMusic();
 
   const [playerHP, setPlayerHP] = useState(maxPlayerHP);
   const [aiHP, setAiHP] = useState(maxAiHP);
