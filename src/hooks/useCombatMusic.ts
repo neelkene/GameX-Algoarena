@@ -149,7 +149,7 @@ function bassLine(time: number, note: number, dur: number, volume = 0.15) {
   const osc = c.createOscillator();
   const osc2 = c.createOscillator();
   const gain = c.createGain();
-  const dist = c.createWaveShaperFunction ? null : null; // fallback
+  // Distortion could be added via c.createWaveShaper() if needed
   const filter = c.createBiquadFilter();
 
   osc.type = "sawtooth";
