@@ -379,7 +379,9 @@ setTimeout(() => {
 
       setShowWeaponCharge("left");
       sounds.weaponCharge(-0.6);
+      combatMusic.triggerBuildup(0.8);
       setCameraZoom(1.18);
+      setCameraX(-22);
       setCameraX(-22);
 
       setTimeout(() => {
