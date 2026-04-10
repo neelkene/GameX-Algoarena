@@ -14,6 +14,7 @@ import {
 } from "./BattleEffects";
 import { getAIChallenge, stolenCodeRewards, type Challenge } from "@/data/challenges";
 import { useSoundEngine } from "@/hooks/useSoundEngine";
+import { useCombatMusic } from "@/hooks/useCombatMusic";
 import type { RobotMood } from "./AnimatedRobot";
 
 interface BattleArenaProps {
