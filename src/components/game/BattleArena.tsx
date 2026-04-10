@@ -14,6 +14,7 @@ import {
 } from "./BattleEffects";
 import { getAIChallenge, stolenCodeRewards, type Challenge } from "@/data/challenges";
 import { useSoundEngine } from "@/hooks/useSoundEngine";
+import { useCombatMusic } from "@/hooks/useCombatMusic";
 import type { RobotMood } from "./AnimatedRobot";
 
 interface BattleArenaProps {
@@ -132,6 +133,7 @@ const BattleArena = ({ language, difficulty, level, onVictory, onDefeat }: Battl
   const maxPlayerHP = 100;
   const maxAiHP = difficultyHP[difficulty];
   const { sounds, startBattleMusic, stopBattleMusic, setMusicIntensity } = useSoundEngine();
+  const combatMusic = useCombatMusic();
 
   const [playerHP, setPlayerHP] = useState(maxPlayerHP);
   const [aiHP, setAiHP] = useState(maxAiHP);
@@ -145,8 +147,8 @@ const BattleArena = ({ language, difficulty, level, onVictory, onDefeat }: Battl
   const [robotMsg, setRobotMsg] = useState("Systems online. Scanning opponent... 🤖");
   const [playerRobotMood, setPlayerRobotMood] = useState<RobotMood>("idle");
   const [aiRobotMood, setAiRobotMood] = useState<RobotMood>("idle");
-  const [playerAction, setPlayerAction] = useState("idle");
-  const [aiAction, setAiAction] = useState("idle");
+  const [playerAction, setPlayerAction] = useState<"idle" | "move" | "attack" | "hit">("idle");
+  const [aiAction, setAiAction] = useState<"idle" | "move" | "attack" | "hit">("idle");
 
   // Animation states
   const [showBeam, setShowBeam] = useState<"left-to-right" | "right-to-left" | null>(null);
@@ -195,11 +197,13 @@ const BattleArena = ({ language, difficulty, level, onVictory, onDefeat }: Battl
     setBattleLog(prev => [...prev.slice(-6), msg]);
   }, []);
 
-  useEffect(() => { startBattleMusic(); return () => stopBattleMusic(); }, []);
+  useEffect(() => { startBattleMusic(); combatMusic.startCombatMusic(); return () => { stopBattleMusic(); combatMusic.stopCombatMusic(); }; }, []);
 
   useEffect(() => {
     const hpRatio = playerHP / maxPlayerHP;
-    setMusicIntensity(hpRatio < 0.3 ? 1.0 : hpRatio < 0.6 ? 0.7 : 0.4);
+    const newIntensity = hpRatio < 0.3 ? 1.0 : hpRatio < 0.6 ? 0.7 : 0.4;
+    setMusicIntensity(newIntensity);
+    combatMusic.setCombatIntensity(newIntensity);
   }, [playerHP, maxPlayerHP]);
 
   // Distant explosions ambient
@@ -238,8 +242,13 @@ const BattleArena = ({ language, difficulty, level, onVictory, onDefeat }: Battl
     }
 
     sounds.heavyImpact(side);
+    combatMusic.triggerHitAccent();
 
-    // Accumulate battlefield degradation
+    // Drop on kill for maximum impact
+    if (isKill) {
+      combatMusic.triggerSilence(0.3);
+      setTimeout(() => combatMusic.triggerDrop(), 350);
+    }
     totalHitsRef.current += 1;
     setBattlefieldDamage(Math.min(1, totalHitsRef.current * 0.08));
 
@@ -375,7 +384,9 @@ setTimeout(() => {
 
       setShowWeaponCharge("left");
       sounds.weaponCharge(-0.6);
+      combatMusic.triggerBuildup(0.8);
       setCameraZoom(1.18);
+      setCameraX(-22);
       setCameraX(-22);
 
       setTimeout(() => {
