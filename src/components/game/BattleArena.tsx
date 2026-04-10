@@ -145,6 +145,8 @@ const BattleArena = ({ language, difficulty, level, onVictory, onDefeat }: Battl
   const [robotMsg, setRobotMsg] = useState("Systems online. Scanning opponent... 🤖");
   const [playerRobotMood, setPlayerRobotMood] = useState<RobotMood>("idle");
   const [aiRobotMood, setAiRobotMood] = useState<RobotMood>("idle");
+  const [playerAction, setPlayerAction] = useState("idle");
+  const [aiAction, setAiAction] = useState("idle");
 
   // Animation states
   const [showBeam, setShowBeam] = useState<"left-to-right" | "right-to-left" | null>(null);
@@ -361,6 +363,15 @@ const BattleArena = ({ language, difficulty, level, onVictory, onDefeat }: Battl
       setRobotMood("happy");
       setRobotMsg("Perfect code! Firing weapons! 🔥");
       setPlayerRobotMood("excited");
+      setPlayerAction("move");
+
+setTimeout(() => {
+  setPlayerAction("attack");
+}, 400);
+
+setTimeout(() => {
+  setPlayerAction("idle");
+}, 900);
 
       setShowWeaponCharge("left");
       sounds.weaponCharge(-0.6);
@@ -498,7 +509,7 @@ const BattleArena = ({ language, difficulty, level, onVictory, onDefeat }: Battl
               initial={{ x: -80, opacity: 0 }} animate={{ x: 0, opacity: 1 }}
               transition={{ duration: 0.6, ease: "easeOut" }}>
               <AnimatedRobot mood={playerRobotMood} size={150} variant="player"
-                damageLevel={playerDamageLevel} showShield={playerShield} recoilDirection={playerRecoil} />
+                damageLevel={playerDamageLevel} showShield={playerShield} recoilDirection={playerRecoil} action={playerAction} />
             </motion.div>
 
             {/* Status Badge */}
@@ -528,7 +539,7 @@ const BattleArena = ({ language, difficulty, level, onVictory, onDefeat }: Battl
               initial={{ x: 80, opacity: 0 }} animate={{ x: 0, opacity: 1 }}
               transition={{ duration: 0.6, ease: "easeOut" }}>
               <AnimatedRobot mood={aiRobotMood} size={150} variant="ai"
-                damageLevel={aiDamageLevel} showShield={aiShield} recoilDirection={aiRecoil} />
+                damageLevel={aiDamageLevel} showShield={aiShield} recoilDirection={aiRecoil} action={aiAction} />
             </motion.div>
 
             {/* All Battle Effects */}
