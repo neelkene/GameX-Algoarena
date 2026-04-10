@@ -197,11 +197,13 @@ const BattleArena = ({ language, difficulty, level, onVictory, onDefeat }: Battl
     setBattleLog(prev => [...prev.slice(-6), msg]);
   }, []);
 
-  useEffect(() => { startBattleMusic(); return () => stopBattleMusic(); }, []);
+  useEffect(() => { startBattleMusic(); combatMusic.startCombatMusic(); return () => { stopBattleMusic(); combatMusic.stopCombatMusic(); }; }, []);
 
   useEffect(() => {
     const hpRatio = playerHP / maxPlayerHP;
-    setMusicIntensity(hpRatio < 0.3 ? 1.0 : hpRatio < 0.6 ? 0.7 : 0.4);
+    const newIntensity = hpRatio < 0.3 ? 1.0 : hpRatio < 0.6 ? 0.7 : 0.4;
+    setMusicIntensity(newIntensity);
+    combatMusic.setCombatIntensity(newIntensity);
   }, [playerHP, maxPlayerHP]);
 
   // Distant explosions ambient
