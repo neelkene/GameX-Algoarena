@@ -15,6 +15,7 @@ import {
 import { getAIChallenge, stolenCodeRewards, type Challenge } from "@/data/challenges";
 import { useSoundEngine } from "@/hooks/useSoundEngine";
 import { useCombatMusic } from "@/hooks/useCombatMusic";
+import CountdownTimer from "./CountdownTimer";
 import type { RobotMood } from "./AnimatedRobot";
 
 interface BattleArenaProps {
