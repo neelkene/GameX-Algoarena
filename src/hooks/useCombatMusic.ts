@@ -17,7 +17,7 @@ function getCtx() {
   if (!ctx) {
     ctx = new AudioContext();
     masterGain = ctx.createGain();
-    masterGain.gain.value = 0.25;
+    masterGain.gain.value = 0.6;
     masterGain.connect(ctx.destination);
   }
   if (ctx.state === "suspended") ctx.resume();
@@ -428,7 +428,7 @@ function setCombatIntensity(value: number) {
   // Adjust master volume with intensity
   if (masterGain && ctx) {
     masterGain.gain.linearRampToValueAtTime(
-      0.18 + intensity * 0.17,
+      0.4 + intensity * 0.4,
       ctx.currentTime + 0.3
     );
   }
@@ -465,7 +465,7 @@ function triggerSilence(duration = 0.8) {
   const now = ctx.currentTime;
   masterGain.gain.setValueAtTime(masterGain.gain.value, now);
   masterGain.gain.linearRampToValueAtTime(0.01, now + 0.05);
-  masterGain.gain.linearRampToValueAtTime(0.18 + intensity * 0.17, now + duration);
+  masterGain.gain.linearRampToValueAtTime(0.4 + intensity * 0.4, now + duration);
 }
 
 export function useCombatMusic() {
