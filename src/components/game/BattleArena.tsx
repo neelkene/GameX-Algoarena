@@ -15,6 +15,7 @@ import {
 import { getAIChallenge, stolenCodeRewards, type Challenge } from "@/data/challenges";
 import { useSoundEngine } from "@/hooks/useSoundEngine";
 import { useCombatMusic } from "@/hooks/useCombatMusic";
+import CountdownTimer from "./CountdownTimer";
 import type { RobotMood } from "./AnimatedRobot";
 
 interface BattleArenaProps {
@@ -216,8 +217,15 @@ const BattleArena = ({ language, difficulty, level, onVictory, onDefeat }: Battl
 
   const handleIntroComplete = useCallback(() => {
     sounds.fightStart();
-    setPhase("ai-attack");
-  }, [sounds]);
+    setRobotMood("thinking");
+    setRobotMsg("You strike first, Commander! Show them your code! 🎯");
+    getAIChallenge(language, difficulty).then(c => {
+      setChallenge(c);
+      setAnswer("");
+      setShowHint(false);
+      setPhase("player-turn");
+    });
+  }, [sounds, language, difficulty]);
 
   // Helper to trigger full impact effects + accumulate battlefield damage
   const triggerImpact = (side: "left" | "right", color: "cyan" | "orange", isKill = false) => {
@@ -487,9 +495,21 @@ setTimeout(() => {
         <div className="lg:col-span-2 arena-panel p-4 flex flex-col"
           style={{ boxShadow: "0 0 30px hsl(195 100% 50% / 0.05)" }}>
           {/* Health Bars */}
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <HealthBar current={playerHP} max={maxPlayerHP} label={langLabel} variant="player" />
-            <HealthBar current={aiHP} max={maxAiHP} label="AI-BOT" variant="ai" />
+          <div className="flex items-center gap-4 mb-4">
+            <div className="flex-1">
+              <HealthBar current={playerHP} max={maxPlayerHP} label={langLabel} variant="player" />
+            </div>
+            <CountdownTimer
+              duration={60}
+              isRunning={phase === "player-turn"}
+              onTimeUp={() => {
+                sounds.defeat();
+                setPhase("defeat");
+              }}
+            />
+            <div className="flex-1">
+              <HealthBar current={aiHP} max={maxAiHP} label="AI-BOT" variant="ai" />
+            </div>
           </div>
 
           {/* Robot Battle View — Cinematic Camera */}
