@@ -40,3 +40,7 @@ const HealthBar = ({ current, max, label, variant }: HealthBarProps) => {
 };
 
 export default HealthBar;
+
+
+
+
