@@ -490,4 +490,4 @@ const AnimatedRobot = ({
   );
 };
 
-export default AnimatedRobot;
+export default AnimatedRobot;    
