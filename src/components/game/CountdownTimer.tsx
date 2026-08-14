@@ -7,7 +7,7 @@ interface CountdownTimerProps {
   isRunning: boolean;
 }
 
-const CountdownTimer = ({ duration = 300, onTimeUp, isRunning }: CountdownTimerProps) => {
+const CountdownTimer = ({ duration = 5*60, onTimeUp, isRunning }: CountdownTimerProps) => {
   const [timeLeft, setTimeLeft] = useState(duration);
 
   useEffect(() => {
